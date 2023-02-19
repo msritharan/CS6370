@@ -23,11 +23,15 @@ class SentenceSegmentation():
 		segmentedText = None
 
 		#Fill in code here
+		segmentedText = []
+		sentence = ""
+		for character in text:
+			sentence += character
+			if character == '.':
+				segmentedText.append(sentence)
+				sentence = ""
 
 		return segmentedText
-
-
-
 
 
 	def punkt(self, text):
