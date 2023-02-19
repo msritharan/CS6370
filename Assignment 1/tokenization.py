@@ -25,6 +25,17 @@ class Tokenization():
 		tokenizedText = None
 
 		#Fill in code here
+		tokenizedText = []
+		for sentence in text:
+			words = []
+			word = ""
+			for character in sentence:
+				if(character == ' '):
+					words.append(word)
+					word = ""
+				else:
+					word += character
+			tokenizedText.append(words)
 
 		return tokenizedText
 
