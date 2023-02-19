@@ -1,9 +1,7 @@
-from util import *
+# from util import *
 
 # Add your import statements here
-
-
-
+import nltk
 
 class SentenceSegmentation():
 
@@ -50,5 +48,7 @@ class SentenceSegmentation():
 		segmentedText = None
 
 		#Fill in code here
+		tokenizer = nltk.data.load('nltk:tokenizers/punkt/english.pickle')
+		segmentedText = tokenizer.tokenize(text)
 		
 		return segmentedText

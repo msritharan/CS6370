@@ -1,7 +1,7 @@
-from util import *
+# from util import *
 
 # Add your import statements here
-
+from nltk.corpus import stopwords 
 
 
 
@@ -27,6 +27,16 @@ class StopwordRemoval():
 		stopwordRemovedText = None
 
 		#Fill in code here
+		stop_words = set(stopwords.words('english'))
+		stopwordRemovedText = []
+		for sentence in text:
+			modified_sentence = []
+			for word in sentence:
+				if word in stop_words:
+					continue
+				else:
+					modified_sentence.append(word)
+			stopwordRemovedText.append(modified_sentence)
 
 		return stopwordRemovedText
 

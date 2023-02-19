@@ -1,7 +1,7 @@
-from util import *
+# from util import *
 
 # Add your import statements here
-
+from nltk.tokenize.treebank import TreebankWordTokenizer
 
 
 
@@ -48,5 +48,9 @@ class Tokenization():
 		tokenizedText = None
 
 		#Fill in code here
+		tokenizedText = []
+		for sentence in text:
+			tokens = TreebankWordTokenizer().tokenize(sentence)
+			tokenizedText.append(tokens)
 
 		return tokenizedText
