@@ -1,9 +1,8 @@
-# from util import *
+from util import *
 
 # Add your import statements here
-from nltk.stem import WordNetLemmatizer
-
-
+from nltk.stem.snowball import SnowballStemmer
+stemmer = SnowballStemmer("english")
 
 class InflectionReduction:
 
@@ -28,13 +27,13 @@ class InflectionReduction:
 
 		#Fill in code here
 		reducedText = []
-		wordnet_lemmatizer = WordNetLemmatizer()
 		for sentence in text:
-			reduced_sentence = []
+			words = []
 			for word in sentence:
-				reduced_sentence.append(wordnet_lemmatizer.lemmatize(word))
-			reducedText.append(reduced_sentence)
-		
+				stemmed_word = stemmer.stem(word)
+				words.append(stemmed_word)
+			reducedText.append(words)
+
 		return reducedText
 
 

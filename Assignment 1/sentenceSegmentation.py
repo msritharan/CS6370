@@ -1,7 +1,8 @@
-# from util import *
+from util import *
 
 # Add your import statements here
 import nltk
+sentence_delimiters = ".!?"
 
 class SentenceSegmentation():
 
@@ -26,10 +27,11 @@ class SentenceSegmentation():
 		segmentedText = []
 		sentence = ""
 		for character in text:
-			sentence += character
-			if character == '.':
+			if character in sentence_delimiters:
 				segmentedText.append(sentence)
 				sentence = ""
+			else:
+				sentence += character
 
 		return segmentedText
 
