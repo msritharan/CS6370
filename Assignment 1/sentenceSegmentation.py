@@ -27,11 +27,10 @@ class SentenceSegmentation():
 		segmentedText = []
 		sentence = ""
 		for character in text:
+			sentence += character
 			if character in sentence_delimiters:
 				segmentedText.append(sentence)
 				sentence = ""
-			else:
-				sentence += character
 
 		return segmentedText
 

@@ -2,8 +2,7 @@ from util import *
 
 # Add your import statements here
 from nltk.tokenize.treebank import TreebankWordTokenizer
-word_delimiters = " /?."
-
+word_delimiters = " ,/()?."
 
 class Tokenization():
 
@@ -31,7 +30,8 @@ class Tokenization():
 			word = ""
 			for character in sentence:
 				if character in word_delimiters:
-					words.append(word)
+					if(len(word) != 0):
+						words.append(word)
 					word = ""
 				else:
 					word += character
