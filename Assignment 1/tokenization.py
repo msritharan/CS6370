@@ -2,7 +2,7 @@ from util import *
 
 # Add your import statements here
 from nltk.tokenize.treebank import TreebankWordTokenizer
-word_delimiters = " ,/()?."
+word_delimiters = "- ,/()?."
 
 class Tokenization():
 
