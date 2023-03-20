@@ -8,7 +8,7 @@ import numpy as np
 class InformationRetrieval():
 
 	def __init__(self):
-		self.index = None
+		self.index = {}
 
 	def buildIndex(self, docs, docIDs):
 		"""
@@ -56,7 +56,7 @@ class InformationRetrieval():
 		# computes df values
 		for doc_id in docIDs:
 			for term in self.tf[doc_id]:
-				if term in self.df:
+				if term in self.idf:
 					self.idf[term] += 1
 				else:
 					self.idf[term] = 1
@@ -80,9 +80,12 @@ class InformationRetrieval():
 		# Compute magnitude of do
 		mag_doc = 0
 		for term in doc:
-			mag_doc2 += (doc[term])**2
+			mag_doc += (doc[term])**2
 		mag_doc = np.sqrt(mag_doc)
 
+		if mag_doc == 0 or mag_query == 0:
+			return 0
+		
 		# Dot Product of query and doc
 		dot_prod = 0
 		for term in query:
@@ -120,6 +123,8 @@ class InformationRetrieval():
 			total_words = 0
 			for sentence in query:
 				for word in sentence:
+					if word not in self.idf:
+						continue
 					if word in query_rep:
 						query_rep[word] += 1
 					else:
@@ -135,17 +140,15 @@ class InformationRetrieval():
 			for doc_id in self.index:
 				cos_sim_score = self.cosine_similarity(query_rep, self.index[doc_id])
 				doc_scores[doc_id] = cos_sim_score
-			sorted(doc_scores, reverse= True)
+			doc_scores = sorted(doc_scores.items(), key=lambda x:x[1], reverse= True)
 			
 			# order of the retrieved documents
 			doc_order = []
-			for doc_id in doc_scores:
-				doc_order.append(doc_id)
+			for doc in doc_scores:
+				doc_order.append(doc[0])
 
 			doc_IDs_ordered.append(doc_order)
 
 		return doc_IDs_ordered
-
-
 
 
