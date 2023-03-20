@@ -33,11 +33,14 @@ class Evaluation():
 
 		#Fill in code here
 		relevant_docs = 0
-		for idx in range(min(k, len(query_doc_IDs_ordered))):
-			doc  = query_doc_IDs_ordered[idx]
-			if doc in true_doc_IDs:
+		for idx in range(k):
+			doc = query_doc_IDs_ordered[idx]
+			if int(doc) in true_doc_IDs:
 				relevant_docs += 1
+		
+		# print(precision, relevant_docs, k)
 		precision = relevant_docs/k
+
 
 		return precision
 
@@ -77,8 +80,8 @@ class Evaluation():
 			query_id = query_ids[idx]
 			query_true_doc_IDs = []
 			for qrel in qrels:
-				if qrel['query_num'] == query_id:
-					query_true_doc_IDs.append(qrel['id'])
+				if int(qrel['query_num']) == query_id:
+					query_true_doc_IDs.append(int(qrel['id']))
 			
 			# precision for a particular query
 			query_precision = self.queryPrecision(doc_IDs_ordered[idx], query_id, query_true_doc_IDs, k)
@@ -115,10 +118,13 @@ class Evaluation():
 		recall = -1
 
 		#Fill in code here
+		if len(true_doc_IDs) == 0:
+			return 0
+		
 		relevant_docs = 0
 		for idx in range(min(k, len(query_doc_IDs_ordered))):
 			doc  = query_doc_IDs_ordered[idx]
-			if doc in true_doc_IDs:
+			if int(doc) in true_doc_IDs:
 				relevant_docs += 1
 		recall = relevant_docs/len(true_doc_IDs)
 
@@ -157,11 +163,11 @@ class Evaluation():
 		num_queries = len(query_ids)
 		for idx in range(num_queries):
 			# for each query id, we would want to find the true_doc_IDs
-			query_id = query_ids[idx]
+			query_id = int(query_ids[idx])
 			query_true_doc_IDs = []
 			for qrel in qrels:
-				if qrel['query_num'] == query_id:
-					query_true_doc_IDs.append(qrel['id'])
+				if int(qrel['query_num']) == query_id:
+					query_true_doc_IDs.append(int(qrel['id']))
 			
 			# recall for a particular query
 			query_recall = self.queryRecall(doc_IDs_ordered[idx], query_id, query_true_doc_IDs, k)
@@ -201,6 +207,9 @@ class Evaluation():
 		precision = self.queryPrecision(query_doc_IDs_ordered, query_id, true_doc_IDs, k)
 		recall = self.queryRecall(query_doc_IDs_ordered, query_id, true_doc_IDs, k) 
 
+		if precision == 0 and recall == 0:
+			return 0
+	
 		fscore = 2*precision*recall/(precision + recall)
 
 		return fscore
@@ -238,11 +247,11 @@ class Evaluation():
 		num_queries = len(query_ids)
 		for idx in range(num_queries):
 			# for each query id, we would want to find the true_doc_IDs
-			query_id = query_ids[idx]
+			query_id = int(query_ids[idx])
 			query_true_doc_IDs = []
 			for qrel in qrels:
-				if qrel['query_num'] == query_id:
-					query_true_doc_IDs.append(qrel['id'])
+				if int(qrel['query_num']) == query_id:
+					query_true_doc_IDs.append(int(qrel['id']))
 			
 			# recall for a particular query
 			query_fscore = self.queryFscore(doc_IDs_ordered[idx], query_id, query_true_doc_IDs, k)
@@ -287,8 +296,8 @@ class Evaluation():
 			# find relevance of document with query
 			rel = 0
 			for qrel in qrels:
-				if qrel['query_num'] == query_id and qrel['id'] == query_doc_IDs_ordered[i - 1]:
-					rel = 5 - qrel['position']
+				if int(qrel['query_num']) == query_id and int(qrel['id']) == query_doc_IDs_ordered[i - 1]:
+					rel = 5 - int(qrel['position'])
 			DCG += rel/np.log2(i + 1)
 
 		# Find set of relevant scores for true docs
@@ -297,20 +306,24 @@ class Evaluation():
 			# find relevance of document with query
 			rel = 0
 			for qrel in qrels:
-				if qrel['query_num'] == query_id and qrel['id'] == true_doc_IDs[i]:
-					rel = 5 - qrel['position']
+				if int(qrel['query_num']) == query_id and int(qrel['id']) == true_doc_IDs[i]:
+					rel = 5 - int(qrel['position'])
 			true_rel.append(rel)
-
+		while len(true_rel) < min(k, len(query_doc_IDs_ordered)):
+			true_rel.append(0)
+		
 		true_rel = np.array(true_rel, dtype= int)
 		true_rel = -np.sort(-true_rel)
 		
 		#Find IDCG
 		IDCG = 0.0
-		for i in range(0, min(k, len(query_doc_IDs_ordered))):
-			rel = true_rel[i]
+		for i in range(1, 1 + min(k, len(query_doc_IDs_ordered))):
+			rel = true_rel[i - 1]
 			IDCG += rel/np.log2(i + 1)
 
 		# Find nDCG
+		if DCG == 0:
+			return 0
 		nDCG = DCG/IDCG
 
 		return nDCG
@@ -348,11 +361,11 @@ class Evaluation():
 		num_queries = len(query_ids)
 		for idx in range(num_queries):
 			# for each query id, we would want to find the true_doc_IDs
-			query_id = query_ids[idx]
+			query_id = int(query_ids[idx])
 			query_true_doc_IDs = []
 			for qrel in qrels:
-				if qrel['query_num'] == query_id:
-					query_true_doc_IDs.append(qrel['id'])
+				if int(qrel['query_num']) == query_id:
+					query_true_doc_IDs.append(int(qrel['id']))
 			
 			# recall for a particular query
 			query_NDCG = self.queryNDCG(doc_IDs_ordered[idx], query_id, query_true_doc_IDs, qrels, k)
@@ -390,10 +403,13 @@ class Evaluation():
 		avgPrecision = -1
 
 		#Fill in code here
+		if len(true_doc_IDs) == 0:
+			return 0
+		
 		avgPrecision = 0
 		for idx in range(min(k, len(query_doc_IDs_ordered))):
-			doc = query_doc_IDs_ordered[idx]
-			if doc in true_doc_IDs:
+			doc = int(query_doc_IDs_ordered[idx])
+			if int(doc) in true_doc_IDs:
 				avgPrecision += self.queryPrecision(query_doc_IDs_ordered, query_id, true_doc_IDs, idx + 1)
 
 		avgPrecision /= len(true_doc_IDs)
@@ -433,11 +449,11 @@ class Evaluation():
 		num_queries = len(query_ids)
 		for idx in range(num_queries):
 			# for each query id, we would want to find the true_doc_IDs
-			query_id = query_ids[idx]
+			query_id = int(query_ids[idx])
 			query_true_doc_IDs = []
 			for qrel in qrels:
-				if qrel['query_num'] == query_id:
-					query_true_doc_IDs.append(qrel['id'])
+				if int(qrel['query_num']) == query_id:
+					query_true_doc_IDs.append(int(qrel['id']))
 			
 			# compute average precision
 			meanAveragePrecision += self.queryAveragePrecision(doc_IDs_ordered[idx], query_id, query_true_doc_IDs, k)
