@@ -27,66 +27,73 @@ class InformationRetrieval():
 		None
 		"""
 
-		index = {}
+		# index will be of the form : {"doc_id" : {"term" : tf_idf value}}
+		self.index = {}
 
-		#Fill in code here
-
-		# find document by id
-		doc_by_id = {}
-		for idx in range(len(docIDs)):
-			doc_by_id[docIDs[idx]] = docs[idx]
-
-		# print(doc_by_id)
-
-		# find term by idx and idx by term
-		index_by_term = {}
-		term_by_index = {}
-		idx = 0
-		for doc in docs:
-			for sentence in doc:
+		# Computation of tf values
+		self.tf = {}	# form : {"doc_id" : {"term" : tf}}
+		num_docs = len(docIDs)
+		for idx in range(num_docs):
+			doc_id = docIDs[idx]
+			self.tf[doc_id] = {}
+			total_words = 0
+			for sentence in docs[idx]:
 				for word in sentence:
-					if word not in index_by_term:
-						index_by_term[word] = idx
-						term_by_index[idx] = word
-						idx += 1
-		
-		# print(term_by_index)
-		# print(index_by_term)
+					if word in self.tf[doc_id]:
+						self.tf[doc_id][word] += 1
+					else:
+						self.tf[doc_id][word] = 1
+					total_words += 1
+			
+			# normalize tf value
+			if total_words != 0:
+				for term in self.tf[doc_id]:
+					self.tf[doc_id][term] /= total_words
+			
 
-		# term frequency of docs
-		term_freq = {}
-		for id in docIDs:
-			f = np.zeros(len(term_by_index))
-			for sentence in doc_by_id[id]:	
-				for word in sentence:
-					f[index_by_term[word]] += 1
-			term_freq[id] = f
-
-		# print(term_freq)
-
-		# document frequency of terms
-		doc_freq = np.zeros(len(term_by_index))
+		# Computation of idf values
+		self.idf = {}	# form : {"term" : idf}
+		# computes df values
 		for doc_id in docIDs:
-			for term_id in range(len(term_freq[doc_id])):
-				if term_freq[doc_id][term_id] > 0:
-					doc_freq[term_id] += 1
-		
-		# print(doc_freq)
+			for term in self.tf[doc_id]:
+				if term in self.df:
+					self.idf[term] += 1
+				else:
+					self.idf[term] = 1
+		# converts to idf smooth values
+		for term in self.idf:
+			self.idf[term] = 1 + np.log(num_docs/(1 + self.idf[term]))
 
-		# compute vector representation of each doc using normalized tf-idf
+		# Computation of tf_idf values
 		for doc_id in docIDs:
-			doc_rep = term_freq[doc_id]/np.max(term_freq[doc_id])
-			doc_rep *= np.log(len(docIDs)/doc_freq)
-			index[doc_id] = doc_rep
+			self.index[doc_id] = {}
+			for term in self.tf[doc_id]:
+				self.index[doc_id][term] = self.tf[doc_id][term]*self.idf[term]
 
-		self.term_by_index = term_by_index
-		self.index_by_term = index_by_term
-		self.doc_by_id = doc_by_id
-		self.doc_freq = doc_freq
-		self.term_freq = term_freq
-		self.index = index
+	def cosine_similarity(self, query, doc):
+		# Compute magnitude of query
+		mag_query = 0
+		for term in query:
+			mag_query += (query[term])**2
+		mag_query = np.sqrt(mag_query)
 
+		# Compute magnitude of do
+		mag_doc = 0
+		for term in doc:
+			mag_doc2 += (doc[term])**2
+		mag_doc = np.sqrt(mag_doc)
 
+		# Dot Product of query and doc
+		dot_prod = 0
+		for term in query:
+			if term in doc:
+				dot_prod += query[term]*doc[term]
+		
+		# Cosine Similarity
+		cos_sim = dot_prod/(mag_query*mag_doc)
+
+		return cos_sim
+	
 	def rank(self, queries):
 		"""
 		Rank the documents according to relevance for each query
@@ -104,37 +111,38 @@ class InformationRetrieval():
 			A list of lists of integers where the ith sub-list is a list of IDs
 			of documents in their predicted order of relevance to the ith query
 		"""
-
 		doc_IDs_ordered = []
 
-		#Fill in code here
 		for query in queries:
-			# find query rep
-			query_rep = np.zeros(len(self.index_by_term))
-			query_f = np.zeros(len(self.index_by_term))
+			# query representation
+			query_rep = {}
+			# tf value
+			total_words = 0
 			for sentence in query:
 				for word in sentence:
-					if word in self.index_by_term:
-						query_f[self.index_by_term[word]] += 1
+					if word in query_rep:
+						query_rep[word] += 1
+					else:
+						query_rep[word] = 1
+				total_words += 1
+			# normalize tf and mul by idf
+			for term in query_rep:
+				query_rep[term] /= total_words
+				query_rep[term] *= self.idf[term]
 			
-			# print(query_f)
-			query_rep = 0.5*query_f/np.max(query_f) + 0.5*(query_f > 0)
-			query_rep *= np.log(len(self.doc_by_id)/self.doc_freq)
-			# print(query_rep)
-
-			# find cosine similarity ordering
-			doc_score = []
+			# compute cos sim scores
+			doc_scores = {}
 			for doc_id in self.index:
-				doc_rep = self.index[doc_id]
-				score = np.dot(query_rep, doc_rep)/(np.linalg.norm(query_rep)*np.linalg.norm(doc_rep))
-				doc_score.append([score, doc_id])
-			doc_score = np.array(doc_score)
-			doc_score = doc_score[-doc_score[:,0].argsort()]
+				cos_sim_score = self.cosine_similarity(query_rep, self.index[doc_id])
+				doc_scores[doc_id] = cos_sim_score
+			sorted(doc_scores, reverse= True)
+			
+			# order of the retrieved documents
+			doc_order = []
+			for doc_id in doc_scores:
+				doc_order.append(doc_id)
 
-			# print(doc_score)
-
-			ret_doc = [x[1] for x in doc_score]
-			doc_IDs_ordered.append(ret_doc)
+			doc_IDs_ordered.append(doc_order)
 
 		return doc_IDs_ordered
 
