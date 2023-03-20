@@ -46,9 +46,9 @@ class InformationRetrieval():
 					total_words += 1
 			
 			# normalize tf value
-			if total_words != 0:
-				for term in self.tf[doc_id]:
-					self.tf[doc_id][term] /= total_words
+			# if total_words != 0:
+			# 	for term in self.tf[doc_id]:
+			# 		self.tf[doc_id][term] /= total_words
 			
 
 		# Computation of idf values
@@ -62,7 +62,7 @@ class InformationRetrieval():
 					self.idf[term] = 1
 		# converts to idf smooth values
 		for term in self.idf:
-			self.idf[term] = 1 + np.log(num_docs/(1 + self.idf[term]))
+			self.idf[term] = np.log(num_docs/(self.idf[term]))
 
 		# Computation of tf_idf values
 		for doc_id in docIDs:
@@ -132,7 +132,7 @@ class InformationRetrieval():
 				total_words += 1
 			# normalize tf and mul by idf
 			for term in query_rep:
-				query_rep[term] /= total_words
+				# query_rep[term] /= total_words
 				query_rep[term] *= self.idf[term]
 			
 			# compute cos sim scores
