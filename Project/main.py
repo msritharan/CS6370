@@ -154,7 +154,7 @@ class SearchEngine:
 		# Read documents
 		docs_json = json.load(open(args.dataset + "cran_docs.json", 'r'))[:]
 		doc_ids, docs = [item["id"] for item in docs_json], \
-								[item["body"] for item in docs_json]
+								[item["body"] + item["title"] for item in docs_json]
 		# Process documents
 		processedDocs = self.preprocessDocs(docs)
 
@@ -195,7 +195,7 @@ class SearchEngine:
 		# 				"fscores": fscores,
 		# 				"MAPs": MAPs,
 		# 				"nDCGs": nDCGs}
-		# with open('eval_metrics_LSA.pkl', 'wb') as fp:
+		# with open('eval_metrics_LSA_250_BT.pkl', 'wb') as fp:
 		# 	pickle.dump(eval_metrics, fp)
 		# 	print('dictionary saved successfully to file')
 		# Plot the metrics and save plot 
@@ -224,7 +224,7 @@ class SearchEngine:
 		# Read documents
 		docs_json = json.load(open(args.dataset + "cran_docs.json", 'r'))[:]
 		doc_ids, docs = [item["id"] for item in docs_json], \
-							[item["body"] for item in docs_json]
+							[item["body"] + item["title"] for item in docs_json]
 		# Process documents
 		processedDocs = self.preprocessDocs(docs)
 

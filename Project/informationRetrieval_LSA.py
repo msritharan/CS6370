@@ -97,7 +97,21 @@ class InformationRetrieval():
             U, Singluar_Values, V = np.linalg.svd(td_mat)
             S = np.diag(Singluar_Values)
             
+            # Choosing the value of K
+            # total_singular_val = np.sum(Singluar_Values)
+            # print("Total sum of singular values = ", total_singular_val)
+            # k = 0
+            # sum_k_singular_val = 0
+            # while k < S.shape[0]:
+            #     sum_k_singular_val += S[k, k]
+            #     if sum_k_singular_val >= 0.8*total_singular_val:
+            #         break
+            #     k += 1
+            # 
+
             k = 250
+            print("Value of k = ", k)
+            
             Uk = U[:, :k]
             Sk = S[:k,:k]
             Vk = V[:k, :]
