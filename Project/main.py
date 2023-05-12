@@ -2,7 +2,7 @@ from sentenceSegmentation import SentenceSegmentation
 from tokenization import Tokenization
 from inflectionReduction import InflectionReduction
 from stopwordRemoval import StopwordRemoval
-from informationRetrieval_LSA import InformationRetrieval
+from informationRetrieval_BERT import InformationRetrieval
 from evaluation import Evaluation
 
 from sys import version_info

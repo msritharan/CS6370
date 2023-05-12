@@ -15,8 +15,17 @@ class InformationRetrieval():
 
         def buildIndex(self, docs, docIDs):
             
-            # Get all the sentences in the corpus
-            sent_docs = flatten(docs)
+            # Convert each doc into a paragraph
+            sent_docs = []
+            for doc in docs:
+                sent_doc = ""
+                for sentence in doc:
+                    for word in sentence:
+                        sent_doc = sent_doc + word + " "
+                sent_docs.append(sent_docs)
+            
+            print("Number of documents :", len(sent_docs))
+
             self.docIDs = docIDs
 
             # Compute Document Embeddings (if not done already)
@@ -30,6 +39,7 @@ class InformationRetrieval():
             else:
                 index = torch.load('index.pt')
             
+            print("Shape of document embeddings, index : ", len(index), len(index[0]))
             self.index = index
         
         def cosine_similarity_vecs(self, query, doc):
@@ -43,9 +53,17 @@ class InformationRetrieval():
 
         def rank(self, queries):
             
-            # Get all the sentences in the queries
-            sent_queries = flatten(queries)
-            
+            # Convert each query into a paragraph
+            sent_queries = []
+            for query in queries:
+                sent_query = ""
+                for sentence in query:
+                    for word in sentence:
+                        sent_query = sent_query + word + " "
+                sent_queries.append(sent_query)
+
+            print("Number of Queries:", len(sent_queries))
+
             # Final Ranking Order
             doc_IDs_ordered = []
 
